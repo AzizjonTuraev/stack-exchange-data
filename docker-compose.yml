@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+
+  postgres:
+    container_name: postgres
+    shm_size: '1gb'
+    ports:
+      - 5434:5432
+    build: ./postgres
+    volumes:
+            - ./postgres/12.2/volumes/backups:/home/backups
+            # Database Volume
+            - ./postgres/12.2/volumes/data:/var/lib/postgresql/data
+
+  metabase:
+    container_name: metabase
+    restart: always
+    ports:
+      - 3001:3000
+    build: ./metabase
+    volumes:
+      - ./metabase/metabase-data:/metabase-data
+    depends_on:
+      - postgres
+    links:
+      - postgres:postgres
+
+  jupyter:
+    container_name: jupyter
+    build:
+      context: ./jupyter
+    volumes:
+      - ./jupyter/jovyan:/home/jovyan/
+    ports:
+      - 8888:8888
